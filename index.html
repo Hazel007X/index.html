@@ -3,38 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UI/UX Quiz & Flashcards</title>
+  <title>Gamification & Design System – Quiz (10)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <meta name="theme-color" content="#111827" />
-  <style>
-    .flip { perspective: 1200px; }
-    .flip-inner { transform-style: preserve-3d; transition: transform 400ms ease; }
-    .flipped .flip-inner { transform: rotateY(180deg); }
-    .flip-front, .flip-back { backface-visibility: hidden; }
-    .flip-back { transform: rotateY(180deg); }
-  </style>
+  <meta name="theme-color" content="#0b1220" />
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-100 antialiased">
-  <div class="max-w-5xl mx-auto p-4 sm:p-6">
+  <div class="max-w-4xl mx-auto p-4 sm:p-6">
     <header class="flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-2xl bg-slate-800 grid place-items-center shadow ring-1 ring-white/10">
-          <span class="text-lg">🧠</span>
-        </div>
+        <div class="h-10 w-10 rounded-2xl bg-slate-800 grid place-items-center ring-1 ring-white/10">🎮</div>
         <div>
-          <h1 class="text-xl sm:text-2xl font-semibold">UI/UX Quiz & Flashcards</h1>
-          <p class="text-slate-300 text-sm">ทวนเร็ว • สอบรอด • ใช้ได้ทั้งควิซและแฟลชการ์ด</p>
+          <h1 class="text-xl sm:text-2xl font-semibold">Gamification & Design System – Quiz</h1>
+          <p class="text-slate-300 text-sm">ชุด 10 ข้อ • ตรวจคะแนนอัตโนมัติ • แชร์ลิ้งให้เพื่อนทำได้</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="themeBtn" class="px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-700 ring-1 ring-white/10">Toggle theme</button>
-      </div>
+      <a class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 ring-1 ring-white/10" href="#" onclick="navigator.clipboard.writeText(location.href); alert('คัดลอกลิ้งแล้ว!'); return false;">คัดลอกลิ้ง</a>
     </header>
-    <nav class="mt-6 grid grid-cols-2 gap-2 sm:w-96">
-      <button data-tab="quiz" class="tab-btn px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/15 ring-1 ring-white/10 font-medium">Quiz</button>
-      <button data-tab="cards" class="tab-btn px-4 py-2 rounded-2xl bg-transparent hover:bg-white/10 ring-1 ring-white/10 font-medium">Flashcards</button>
-    </nav>
-    <section id="quiz" class="tab-panel mt-6">
+
+    <main class="mt-6">
       <div id="quizList" class="space-y-5"></div>
       <div class="mt-6 flex items-center gap-3">
         <button id="submitBtn" class="px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow">ส่งคำตอบ</button>
@@ -46,50 +32,71 @@
           <p class="text-slate-300 text-sm">มีเฉลยและคำอธิบายใต้ข้อที่ตอบ</p>
         </div>
       </div>
-    </section>
-    <section id="cards" class="tab-panel mt-6 hidden">
-      <div class="flex items-center justify-between gap-3">
-        <div><p class="text-slate-300 text-sm">แตะการ์ดเพื่อสลับ <span class="font-medium">คำถาม ⇄ คำตอบ</span></p></div>
-        <div class="flex items-center gap-2">
-          <button id="shuffleBtn" class="px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-700 ring-1 ring-white/10">สับไพ่</button>
-          <button id="prevBtn" class="px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-700 ring-1 ring-white/10">ก่อนหน้า</button>
-          <button id="nextBtn" class="px-3 py-2 rounded-xl bg-slate-800/70 hover:bg-slate-700 ring-1 ring-white/10">ถัดไป</button>
-        </div>
-      </div>
-      <div id="cardCounter" class="mt-3 text-sm text-slate-300"></div>
-      <div id="flashWrap" class="mt-4 flip rounded-3xl overflow-hidden">
-        <div id="flash" class="flip-inner">
-          <div class="flip-front min-h-[220px] rounded-3xl bg-white/5 ring-1 ring-white/10 p-6 grid place-items-center">
-            <p id="qFront" class="text-lg sm:text-xl font-medium text-center"></p>
-          </div>
-          <div class="flip-back min-h-[220px] rounded-3xl bg-emerald-500/10 ring-1 ring-emerald-400/20 p-6 grid place-items-center">
-            <p id="qBack" class="text-lg sm:text-xl text-emerald-300 font-medium text-center"></p>
-          </div>
-        </div>
-      </div>
-    </section>
+    </main>
+
     <footer class="mt-10 text-center text-xs text-slate-400">
-      ทำโดยไฟล์เดียว • ใช้ Tailwind CDN • เก็บข้อมูลในหน้านี้ ไม่ง้อเซิร์ฟเวอร์
+      Single-file • Tailwind CDN • แชร์ไฟล์นี้ผ่าน GitHub Pages/Netlify ก็ได้
     </footer>
   </div>
+
   <script>
-    const data = [
-      {q:'หลักการ Usability เน้นไปที่อะไร?',choices:['ความสวยงามของ UI','ความสามารถในการใช้งานง่ายของผู้ใช้','การใช้สีให้สดใส','การออกแบบให้ดูแพง'],answer:1,why:'Usability = ใช้งานง่าย เข้าใจได้เร็ว ทำภารกิจสำเร็จ'},
-      {q:'“Don\'t make user think” หมายถึงอะไร?',choices:['ใช้สีตัดกันแรง ๆ','ใช้คำสั้น ๆ และไอคอนที่คุ้นเคย','ทำให้ผู้ใช้ลองผิดลองถูกเอง','เพิ่มตัวเลือกให้เยอะ ๆ'],answer:1,why:'ลดภาระคิด: คำชัด ไอคอนคุ้น ลดการตีความ'},
-      {q:'หลักการ Integrity ในการออกแบบ UI หมายถึง…',choices:['ความสม่ำเสมอ','ความน่าเชื่อถือของระบบ','ทำให้ผู้ใช้เพลิดเพลิน','ใช้ปุ่มใหญ่ ๆ'],answer:1,why:'Integrity = เชื่อถือได้ โปร่งใส ไม่หลอกผู้ใช้'},
-      {q:'ตัวอย่างใดเข้ากับ User Friendly ที่สุด?',choices:['ฟอร์มสมัครสมาชิกที่ต้องกรอก 20 ช่อง','หน้าเว็บที่ใช้แต่ภาษาวิชาการ','แอปที่มีปุ่มค้นหาชัดเจนและกรองข้อมูลได้ง่าย','เว็บไซต์ที่ใช้ตัวหนังสือเล็กมาก ๆ'],answer:2,why:'เป็นมิตร = เข้าถึงง่าย เดาได้ กดได้ไว'},
-      {q:'Fitt\'s Law พูดถึงเรื่องอะไร?',choices:['สีของ UI','การเรียนรู้ของสมอง','ขนาดและระยะทางของปุ่มที่ทำให้กดง่ายขึ้น','การจดจำโลโก้'],answer:2,why:'ปุ่มใหญ่ ใกล้ = เข้าถึงเร็ว ลดเวลาเป้าไปยังจุด'},
-      {q:'Hick\'s Law บอกว่า…',choices:['ยิ่งปุ่มใหญ่ยิ่งกดง่าย','ยิ่งตัวเลือกเยอะ ผู้ใช้ยิ่งตัดสินใจช้า','ยิ่งสีสด ผู้ใช้ยิ่งสนใจ','ยิ่งใช้รูปเยอะ ผู้ใช้ยิ่งจดจำได้'],answer:1,why:'ลดตัวเลือก = ตัดสินใจไว จัดเป็นขั้นตอนแทนรายการยาว ๆ'},
-      {q:'“Thinking Fast & Thinking Slow” สื่อถึง…',choices:['สีร้อน-เย็นใน UI','สมองแบบเร็ว (สัญชาตญาณ) และช้า (ใช้เหตุผล)','โหลดหน้าเว็บเร็ว vs ช้า','การเลือกใช้ฟอนต์'],answer:1,why:'Kahneman: System 1 vs System 2'},
-      {q:'การออกแบบที่กระตุ้นอารมณ์ผู้ใช้ เรียกว่า…',choices:['Recognition Pattern','Emotional Design','Hick\'s Law','Integrity'],answer:1,why:'ความรู้สึกที่ดีทำให้คนอยากใช้และกลับมาอีก'},
-      {q:'ไอคอน “ตะกร้าสินค้า” เป็นหลัก…',choices:['Usability','Storytelling','Recognition Pattern','Cognitive Load'],answer:2,why:'ใช้รูปแบบที่คุ้นเคย ลดเวลาเรียนรู้'},
-      {q:'ข้อใดเป็นตัวอย่าง Storytelling ใน UI?',choices:['ปุ่มสีแดงชัดเจน','Netflix จัดเนื้อหาเป็นหมวด ๆ','เว็บท่องเที่ยวเล่าเรื่องประสบการณ์จริงของลูกค้า','ปุ่ม Login ใหญ่และอยู่ใกล้'],answer:2,why:'เล่าเรื่อง = ทำให้จดจำและอินกับคอนเทนต์'}
-    ];
-    const quizList=document.getElementById('quizList');
-    data.forEach((item,idx)=>{const qEl=document.createElement('div');qEl.className='rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 sm:p-5';qEl.innerHTML=`<div class="flex items-start gap-3"><div class="shrink-0 mt-1 h-7 w-7 grid place-items-center rounded-xl bg-slate-800/70 ring-1 ring-white/10 text-sm">${idx+1}</div><div class="w-full"><p class="font-medium">${item.q}</p><div class="mt-3 grid gap-2">${item.choices.map((c,i)=>`<label class=\"flex items-start gap-3 px-3 py-2 rounded-xl bg-black/10 hover:bg-black/15 cursor-pointer\"><input type=\"radio\" name=\"q${idx}\" value=\"${i}\" class=\"mt-1\"> <span>${c}</span></label>`).join('')}</div><div class="mt-3 hidden text-sm" id="explain-${idx}"></div></div></div>`;quizList.appendChild(qEl);});
-    document.getElementById('submitBtn').addEventListener('click',()=>{let correct=0;data.forEach((item,idx)=>{const picked=document.querySelector(`input[name=q${idx}]:checked`);const box=document.getElementById(`explain-${idx}`);if(!picked){box.className='mt-3 text-sm text-amber-300';box.textContent='ยังไม่ได้เลือกคำตอบ';box.classList.remove('hidden');return;}const ans=Number(picked.value);const isRight=ans===item.answer;if(isRight)correct++;box.className=`mt-3 text-sm ${isRight?'text-emerald-300':'text-rose-300'}`;const letter=['a','b','c','d'][item.answer];box.textContent=`${isRight?'✅ ถูกต้อง':'❌ ไม่ถูก'} • เฉลย: ${letter}) ${item.choices[item.answer]} — ${item.why}`;box.classList.remove('hidden');});document.getElementById('score').textContent=`${correct} / ${data.length}`;document.getElementById('result').classList.remove('hidden');window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});});
-    document.getElementById('resetBtn').addEventListener('click',()=>{document.querySelectorAll('input[type=radio]').forEach(i=>i.checked=false);document.querySelectorAll('[id^=explain-]').forEach(el=>{el.classList.add('hidden');el.textContent='';});document.getElementById('result').classList.add('hidden');document.getElementById('score').textContent='';window.scrollTo({top:0,behavior:'smooth'});});
-    const cards=data.map(d=>({front:d.q,back:`${['a','b','c','d'][d.answer]}) ${d.choices[d.answer]}\n\nเหตุผล: ${d.why}`}));let idx=0;const wrap=document.getElementById('flashWrap');const front=document.getElementById('qFront');const back=document.getElementById('qBack');const counter=document.getElementById('cardCounter');function renderCard(){const c=cards[idx];front.textContent=c.front;back.textContent=c.back;counter.textContent=`การ์ด ${idx+1} / ${cards.length}`;}function shuffle(){for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}idx=0;renderCard();}wrap.addEventListener('click',()=>wrap.classList.toggle('flipped'));document.getElementById('nextBtn').addEventListener('click',()=>{idx=(idx+1)%cards.length;wrap.classList.remove('flipped');renderCard();});document.getElementById('prevBtn').addEventListener('click',()=>{idx=(idx-1+cards.length)%cards.length;wrap.classList.remove('flipped');renderCard();});document.getElementById('shuffleBtn').addEventListener('click',()=>{wrap.classList.remove('flipped');shuffle();});const tabs=document.querySelectorAll('.tab-btn');const panels=document.querySelectorAll('.tab-panel');tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(b=>b.classList.remove('bg-white/10'));btn.classList.add('bg-white/10');panels.forEach(p=>p.classList.add('hidden'));document.getElementById(btn.dataset.tab).classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}));const themeBtn=document.getElementById('themeBtn');let light=false;themeBtn.addEventListener('click',()=>{light=!light;document.body.className=light?'min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900':'min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-100';});renderCard();
+    const data = [{"q": "ข้อใดอธิบาย Gamification ได้ถูกต้องที่สุด?", "choices": ["ทำให้ UI ดูเหมือนเกม", "ใช้กลไกของเกมมาจูงใจการใช้งาน", "เพิ่มภาพตัวละครลงในแอป", "เพิ่มสี派เท่านั้น"], "answer": 1, "why": "Gamification คือการยืม 'กลไกเกม' เช่น แต้ม/ภารกิจ/ลำดับขั้น มาจูงใจการใช้งาน"}, {"q": "ลำดับขั้นของ Hook Model ที่ถูกต้องคือข้อใด", "choices": ["Action → Trigger → Reward → Investment", "Trigger → Action → Reward → Investment", "Reward → Trigger → Action → Investment", "Trigger → Reward → Investment → Action"], "answer": 1, "why": "เริ่มจากสิ่งกระตุ้น (Trigger) → การกระทำ (Action) → รางวัล (Reward) → การลงทุน/ผูกพัน (Investment)"}, {"q": "ฮอร์โมนที่สัมพันธ์กับ 'ความพึงพอใจจากการได้รางวัล' มากที่สุดคือ", "choices": ["Endorphin", "Dopamine", "Serotonin", "Oxytocin"], "answer": 1, "why": "Dopamine เชื่อมโยงกับระบบรางวัลและแรงจูงใจ"}, {"q": "ตัวอย่างของ Trigger ที่ดีในแอปคือข้อใด", "choices": ["หน้า Settings ที่ซ่อนปุ่ม", "Push Notification เตือนภารกิจครบกำหนด", "ปุ่มที่เล็กและอยู่ไกล", "การโหลดช้า ๆ"], "answer": 1, "why": "Trigger คือสิ่งกระตุ้นให้ผู้ใช้กลับมาทำ Action เช่น การแจ้งเตือน"}, {"q": "ข้อใดคือผลที่ดีของการมี Reward ที่เหมาะสม", "choices": ["ทำให้ผู้ใช้สับสน", "ลดการกลับมาใช้งาน", "เพิ่มการมีส่วนร่วมและการกลับมาใช้งานซ้ำ", "ทำให้ Usability แย่ลงเสมอ"], "answer": 2, "why": "รางวัลที่เหมาะสมช่วยคงการมีส่วนร่วม และทำให้ผู้ใช้กลับมา"}, {"q": "Design System มีเป้าหมายหลักคือ", "choices": ["ทำให้งานสวยงามอย่างเดียว", "รวม Guideline + Component เพื่อความสม่ำเสมอและขยายงานได้", "ตัดขั้นตอนพัฒนาให้หมด", "ใช้ได้เฉพาะทีมเล็กเท่านั้น"], "answer": 1, "why": "Design System = Guideline + Library ที่ทำให้งานคงเส้นคงวาและ Scale ได้"}, {"q": "ข้อใด 'ไม่ใช่' องค์ประกอบของ Design System", "choices": ["Typography / Colors", "Icons & Components", "Server / Database", "Variables (เช่น สีหลัก/รอง)"], "answer": 2, "why": "Server/Database เป็นเรื่อง backend ไม่ใช่องค์ประกอบของ Design System"}, {"q": "ข้อดีของ Design System คือ", "choices": ["ลด Consistency", "ทำงานเร็วขึ้นและสเกลได้", "ทำให้ออกแบบช้าลงเสมอ", "ไม่ต้องดูแลอัปเดตเลย"], "answer": 1, "why": "มี asset และกฎพร้อมใช้ → เร็วขึ้นและขยายงานได้"}, {"q": "ข้อเสีย/ความท้าทายของ Design System คือ", "choices": ["ต้องใช้เวลา/ทรัพยากรดูแลอัปเดต", "ใช้งานไม่ได้กับทีมใหญ่", "ทำให้ UX แย่ลงเสมอ", "ไม่มีค่าใช้จ่ายในการพัฒนา"], "answer": 0, "why": "ต้องมีเจ้าของระบบคอยบำรุงรักษาและอัปเดต"}, {"q": "ขั้นตอน Investment ใน Hook Model หมายถึง", "choices": ["ผู้ใช้ได้รับรางวัล", "ผู้ใช้ลงแรง/ข้อมูล เช่น กรอกโปรไฟล์ สะสมแต้ม", "ระบบส่งแจ้งเตือน", "ผู้ใช้กดปุ่มเริ่มภารกิจ"], "answer": 1, "why": "Investment คือการที่ผู้ใช้ 'ผูกพัน' กับระบบมากขึ้นผ่านการลงทุนลงแรง/ข้อมูล"}];
+
+    const quizList = document.getElementById('quizList');
+    data.forEach((item, idx) => {
+      const qEl = document.createElement('div');
+      qEl.className = 'rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 sm:p-5';
+      qEl.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="shrink-0 mt-1 h-7 w-7 grid place-items-center rounded-xl bg-slate-800/70 ring-1 ring-white/10 text-sm">${idx+1}</div>
+          <div class="w-full">
+            <p class="font-medium">${item.q}</p>
+            <div class="mt-3 grid gap-2">
+              ${item.choices.map((c,i)=>`
+                <label class="flex items-start gap-3 px-3 py-2 rounded-xl bg-black/10 hover:bg-black/15 cursor-pointer">
+                  <input type="radio" name="q${idx}" value="${i}" class="mt-1">
+                  <span>${c}</span>
+                </label>
+              `).join('')}
+            </div>
+            <div class="mt-3 hidden text-sm" id="explain-${idx}"></div>
+          </div>
+        </div>
+      `;
+      quizList.appendChild(qEl);
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      let correct = 0;
+      data.forEach((item, idx) => {
+        const picked = document.querySelector(`input[name=q${idx}]:checked`);
+        const box = document.getElementById(`explain-${idx}`);
+        if (!picked) {
+          box.className = 'mt-3 text-sm text-amber-300';
+          box.textContent = 'ยังไม่ได้เลือกคำตอบ';
+          box.classList.remove('hidden');
+          return;
+        }
+        const ans = Number(picked.value);
+        const isRight = ans === item.answer;
+        if (isRight) correct++;
+        box.className = `mt-3 text-sm ${isRight? 'text-emerald-300' : 'text-rose-300'}`;
+        const letter = ['a','b','c','d'][item.answer];
+        box.textContent = `${isRight? '✅ ถูกต้อง' : '❌ ไม่ถูก'} • เฉลย: ${letter}) ${item.choices[item.answer]} — ${item.why}`;
+        box.classList.remove('hidden');
+      });
+      document.getElementById('score').textContent = `${correct} / ${data.length}`;
+      document.getElementById('result').classList.remove('hidden');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.querySelectorAll('input[type=radio]').forEach(i=> i.checked=false);
+      document.querySelectorAll('[id^=explain-]').forEach(el=>{ el.classList.add('hidden'); el.textContent=''; });
+      document.getElementById('result').classList.add('hidden');
+      document.getElementById('score').textContent = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   </script>
 </body>
 </html>
