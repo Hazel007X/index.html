@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>UI/UX Master Quiz – ข้อละข้อ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<meta name="theme-color" content="#0b1220"/>
+<style>
+.btn-opt { display:block; width:100%; text-align:left; }
+.btn-opt[data-picked="true"] { outline: 2px solid rgb(16,185,129); }
+.tf-btn[data-picked="true"] { box-shadow: 0 0 0 2px rgba(16,185,129,1) inset, 0 0 0 2px rgba(16,185,129,.8); background-color: rgba(16,185,129,.12); }
+.tf-row[data-picked="true"] { box-shadow: 0 0 0 2px rgba(16,185,129,1) inset; border-radius: 1rem; }
+
+.tf-row[data-state="true"]  { outline: 3px solid #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,.3); border-radius: 1rem; }
+.tf-row[data-state="false"] { outline: 3px solid #f43f5e;  box-shadow: 0 0 0 2px rgba(244,63,94,.25);  border-radius: 1rem; }
+.tf-btn[data-picked="true"][data-type="true"]  { box-shadow: 0 0 0 2px rgba(16,185,129,1) inset, 0 0 0 2px rgba(16,185,129,.8); background-color: rgba(16,185,129,.12); }
+.tf-btn[data-picked="true"][data-type="false"] { box-shadow: 0 0 0 2px rgba(244,63,94,1)  inset, 0 0 0 2px rgba(244,63,94,.8);  background-color: rgba(244,63,94,.12); }
+
+
+/* Strong selected styles */
+.tf-btn.selected-true  { 
+  background-color: transparent !important; 
+  color: #10b981 !important; 
+  outline: 3px solid #10b981 !important; 
+  box-shadow: 0 0 0 2px rgba(16,185,129,.25) inset !important; 
+  border-radius: .75rem !important;
+}
+.tf-btn.selected-false { 
+  background-color: transparent !important; 
+  color: #f43f5e !important; 
+  outline: 3px solid #f43f5e !important; 
+  box-shadow: 0 0 0 2px rgba(244,63,94,.25) inset !important; 
+  border-radius: .75rem !important;
+}
+
+
+
+.tf-row[data-state="false"] { background-color: rgba(244,63,94,.08); }
+
+
+/* Soft background on selected state (forced) */
+.tf-row[data-state="true"]  { background-color: rgba(16,185,129,.12) !important; box-shadow: 0 0 0 3px rgba(16,185,129,.45) inset !important; }
+.tf-row[data-state="false"] { background-color: rgba(244,63,94,.12) !important;  box-shadow: 0 0 0 3px rgba(244,63,94,.40)  inset !important; }
+
+
+/* Vivid solid states for TF buttons */
+.tf-btn.selected-true  { background-color:#22c55e !important; color:#fff !important; outline:none !important; box-shadow:none !important; }
+.tf-btn.selected-false { background-color:#ef4444 !important; color:#fff !important; outline:none !important; box-shadow:none !important; }
+.tf-btn { transition: all .12s ease; }
+
+</style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-100 antialiased">
+<div class="max-w-4xl mx-auto p-4 sm:p-6">
+  <header class="flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-2xl bg-slate-800 grid place-items-center ring-1 ring-white/10">🎯</div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-semibold">UI/UX Master Quiz — ทำแบบ “ข้อๆ”</h1>
+        <p class="text-slate-300 text-sm">MCQ 40 (ข้อต่อข้อ) • จับคู่ 20 • ถูก/ผิด 20</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="copyLink" class="px-3 py-2 rounded-2xl bg-white/10 ring-1 ring-white/10 hover:bg-white/15">คัดลอกลิ้ง</button>
+      <a href="#match" class="px-3 py-2 rounded-2xl bg-white/10 ring-1 ring-white/10 hover:bg-white/15">ไปจับคู่</a>
+      <a href="#tf" class="px-3 py-2 rounded-2xl bg-white/10 ring-1 ring-white/10 hover:bg-white/15">ไปถูก/ผิด</a>
+    </div>
+  </header>
+
+  <!-- MCQ One-by-one -->
+  <section id="mcq" class="mt-6">
+    <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-300">ข้อ <span id="qIdx"></span> / <span id="qTotal"></span></p>
+        <div class="w-1/2 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div id="progress" class="h-full bg-emerald-400" style="width:0%"></div>
+        </div>
+      </div>
+      <h2 id="qText" class="mt-3 text-lg font-medium"></h2>
+      <div id="opts" class="mt-4 grid gap-2"></div>
+      <div id="exp" class="mt-3 text-sm"></div>
+      <div class="mt-5 flex items-center gap-2">
+        <button id="prev" class="px-4 py-2 rounded-xl bg-white/10 ring-1 ring-white/10 hover:bg-white/15">ก่อนหน้า</button>
+        <button id="next" class="px-4 py-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600">ถัดไป</button>
+        <button id="check" class="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600">ตรวจข้อ</button>
+        <button id="mcqAll" class="ml-auto px-4 py-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600">สรุปคะแนน MCQ</button>
+      </div>
+      <p id="mcqScore" class="mt-3 text-slate-300"></p>
+    </div>
+  </section>
+
+  <!-- Matching -->
+  <section id="match" class="mt-10">
+    <h3 class="text-lg font-semibold mb-2">B) จับคู่ (20 ข้อ)</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
+        <h4 class="font-medium mb-2">Bank 1</h4>
+        <ol class="text-slate-300 list-decimal pl-6">
+          <li>Fitts’ Law</li><li>Hick’s Law</li><li>Recognition > Recall</li><li>Cognitive Walkthrough</li><li>Heuristic Evaluation</li><li>Formative</li><li>Summative</li><li>Thinking-aloud</li><li>A/B Testing</li><li>Performance Measurement</li>
+        </ol>
+      </div>
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
+        <h4 class="font-medium mb-2">ข้อ 1–10 (เลือก 1–10)</h4>
+        <div id="match1" class="grid gap-2"></div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-6">
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
+        <h4 class="font-medium mb-2">Bank 2</h4>
+        <ol class="text-slate-300 list-decimal pl-6">
+          <li>Atom</li><li>Molecule</li><li>Organism</li><li>Template</li><li>Page</li><li>Margin</li><li>Gutter</li><li>Columns</li><li>Variant</li><li>State</li>
+        </ol>
+      </div>
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
+        <h4 class="font-medium mb-2">ข้อ 11–20 (เลือก 1–10)</h4>
+        <div id="match2" class="grid gap-2"></div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+      <button id="matchSubmit" class="px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold">ตรวจจับคู่</button>
+      <p id="matchScore" class="text-slate-300"></p>
+    </div>
+  </section>
+
+  <!-- True/False -->
+  <section id="tf" class="mt-10">
+    <h3 class="text-lg font-semibold mb-2">C) ถูก/ผิด (20 ข้อ)</h3>
+    <div id="tfList" class="space-y-3"></div>
+    <div class="mt-4 flex items-center gap-3">
+      <button id="tfSubmit" class="px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold">ตรวจ ถูก/ผิด</button>
+      <p id="tfScore" class="text-slate-300"></p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const mcqData = [{"q": "หลัก “Don’t make users think” สื่อใจความใดมากที่สุด", "choices": ["ใช้แอนิเมชันเยอะๆ", "ให้ผู้ใช้เดาทางเอง", "ลดภาระคิดด้วยคำ/สัญลักษณ์ที่คุ้นเคย", "ซ่อนฟังก์ชัน", "ใช้ศัพท์เทคนิค"], "answer": 2}, {"q": "Recognition > Recall หมายถึง", "choices": ["ให้จำเองมากๆ", "ใช้ UI ที่ผู้ใช้ “จำได้” แทน “ต้องระลึกเอง”", "ย้ายทุกอย่างเข้าคีย์บอร์ด", "ใช้โทนสีเดียว", "ตัดไอคอนออก"], "answer": 1}, {"q": "Fitts’ Law โฟกัสเรื่อง", "choices": ["สี", "ตัวอักษร", "ขนาด/ระยะของเป้าหมายคลิก", "เสียงเตือน", "รูปทรงปุ่ม"], "answer": 2}, {"q": "Hick’s Law สรุปสั้นๆ", "choices": ["ปุ่มใหญ่กดง่าย", "ตัวเลือกเยอะ = ตัดสินใจช้า", "สีสด = สนใจ", "ตัวอักษรเล็กอ่านยาก", "เลย์เอาต์แน่นดูโปร"], "answer": 1}, {"q": "Emotional Design เน้น", "choices": ["ความรู้สึกเชิงบวกเพื่อเพิ่มการยอมรับ", "ประสิทธิภาพฝั่งเซิร์ฟเวอร์", "การทำ A/B เสมอ", "การล็อกอินหลายชั้น", "ปรับโทนสีเทา"], "answer": 0}, {"q": "ฮอร์โมนที่โยงกับ “รางวัล/แรงจูงใจ” มากสุด", "choices": ["Endorphin", "Dopamine", "Serotonin", "Oxytocin", "Cortisol"], "answer": 1}, {"q": "ข้อใดคือ Gamification ที่แท้จริง", "choices": ["ทำ UI ให้เหมือนเกม", "เพิ่มการ์ตูนในแอป", "ใช้กลไกเกม (แต้ม/เลเวล/ภารกิจ) จูงใจพฤติกรรม", "เปลี่ยนฟอนต์", "ทำโลโก้ใหม่"], "answer": 2}, {"q": "ใน Hook Model ขั้นตอนใดคือ “สิ่งกระตุ้น”", "choices": ["Action", "Reward", "Trigger", "Investment", "Feedback"], "answer": 2}, {"q": "ขั้นตอน Investment คือ", "choices": ["รับรางวัล", "กดเริ่ม", "ลงแรง/ผูกพัน เช่น กรอกโปรไฟล์ สะสมรายการ", "แจ้งเตือน", "ยืนยันอีเมล"], "answer": 2}, {"q": "ตัวอย่าง Reward ที่เหมาะสม", "choices": ["ป๊อปอัพถี่", "แต้มสะสม+Badge เมื่อทำภารกิจเสร็จ", "ล็อกปุ่ม", "ข้อความยาวๆ", "บังคับดูวิดีโอ"], "answer": 1}, {"q": "Design System คือ", "choices": ["ชุดไฟล์ภาพ", "ระบบกฎ+สไตล์+คอมโพเนนต์ เพื่อ consistency/scale", "คู่มือเขียนโค้ด", "CMS", "API ชุดหนึ่ง"], "answer": 1}, {"q": "ไอคอนใน DS ที่ “ดี” ต้อง", "choices": ["ปน outline/solid ได้", "น้ำหนักเส้น/มุม/กริด/ขนาด สม่ำเสมอ", "ใช้ PNG หลายขนาด", "เส้นไม่เท่ากันเพื่อศิลป์", "ไม่มี baseline"], "answer": 1}, {"q": "Component ควรระบุ", "choices": ["แค่สี", "แค่ชื่อ", "state/variant/props/behavior", "คนออกแบบ", "เวลาสร้าง"], "answer": 2}, {"q": "ตัวอย่าง state", "choices": ["primary", "md", "hover", "rounded", "filled"], "answer": 2}, {"q": "Anatomy ของ Grid", "choices": ["Padding/Frame/Rule", "Margin/Gutter/Columns", "Space/Area/Rows", "Box/Cell/Rule", "Edge/Line/Box"], "answer": 1}, {"q": "Atomic Design เรียงถูก", "choices": ["Atom→Molecule→Organism→Template→Page", "Atom→Organism→Molecule→Template→Page", "Organism→Atom→Molecule→Template→Page", "Page→Template→Organism→Molecule→Atom", "Template→Page→Molecule→Atom→Organism"], "answer": 0}, {"q": "Template ต่างจาก Page ที่", "choices": ["Template คือโครง, Page เติมคอนเทนต์จริง", "เท่ากัน", "Page คือชุดสี", "Template คือฟอนต์", "Page คือคอมโพเนนต์"], "answer": 0}, {"q": "จอ Desktop ทั่วไป", "choices": ["1920×1080/2560×1440", "320×480", "768×1024", "640×480", "2880×512"], "answer": 0}, {"q": "การทดสอบ Formative", "choices": ["หลังปล่อยจริง", "ระหว่างพัฒนาเพื่อหาจุดพลาดไว", "ใช้เฉพาะผู้เชี่ยวชาญ", "ใช้เฉพาะสอบถาม", "ทำครั้งเดียว"], "answer": 1}, {"q": "การทดสอบ Summative เน้น", "choices": ["เก็บความเห็นก่อนเริ่ม", "สรุปผลหลังเสร็จ/เทียบเกณฑ์", "ออกแบบสี", "เลือกฟอนต์", "กำหนด persona"], "answer": 1}, {"q": "Passive evaluation เด่นเรื่อง", "choices": ["กลุ่มใหญ่/ต้นทุนต่ำ", "ลึกเชิงพฤติกรรม", "ใช้ผู้เชี่ยวชาญ", "สุ่ม A/B", "วัดโหลดเซิร์ฟเวอร์"], "answer": 0}, {"q": "Active evaluation เด่นเรื่อง", "choices": ["แบบสอบถาม", "ให้ทำ task จริง เก็บเวลา/error/คลิก", "ประชุมทีม", "ตรวจโค้ด", "ใช้ log server เท่านั้น"], "answer": 1}, {"q": "Predictive/Inspection คือ", "choices": ["ผู้เชี่ยวชาญตรวจตามหลักการ", "ผู้ใช้จริงทดสอบ", "สุ่ม A/B", "ดูวิดีโอเท่านั้น", "ใช้ KPI การตลาด"], "answer": 0}, {"q": "Heuristic evaluation คือ", "choices": ["เดินตาม flow มือใหม่", "เทียบกับหลักการ UX (Nielsen/ฯลฯ)", "ถามหลังใช้งาน", "สัมภาษณ์เชิงลึก", "วัด latency"], "answer": 1}, {"q": "Cognitive walkthrough เน้น", "choices": ["มือใหม่ทำงานทีละขั้น เข้าใจต่อได้ไหม", "ผู้เชี่ยวชาญตรวจ", "สุ่ม A/B", "แบบสอบถาม", "SUS อย่างเดียว"], "answer": 0}, {"q": "Thinking-aloud ให้", "choices": ["ผู้ใช้พูดความคิดระหว่างทำงาน", "ทีม dev เล่า", "ผู้เชี่ยวชาญให้คะแนน", "ระบบสุ่ม", "นักการตลาดตัดสิน"], "answer": 0}, {"q": "Retrospective protocol เสี่ยง", "choices": ["โอเวอร์ฟิต", "Hawthorne effect", "overclock", "memory leak", "sampling bias อย่างเดียว"], "answer": 1}, {"q": "ตัวชี้วัดใน Performance measurement", "choices": ["เวลาเสร็จงาน", "error rate", "จำนวนคลิก/ย้อน", "SUS", "ทั้งหมด"], "answer": 4}, {"q": "A/B testing ที่ถูก", "choices": ["ให้ผู้ใช้เลือกเวอร์ชันเอง", "เปลี่ยนหลายอย่างพร้อมกัน", "แบ่งกลุ่มแบบสุ่ม วัด KPI เดียวกัน", "กลุ่มไม่เท่ากันได้", "วัดคร่าวๆ"], "answer": 2}, {"q": "Browser compatibility คือ", "choices": ["รันบนหลายเบราว์เซอร์ได้", "รองรับหลายภาษา", "โหลดไว", "มี SSL", "มี CDN"], "answer": 0}, {"q": "Mobile UI testing ควรโฟกัส", "choices": ["battery/touch/offline/device compatibility", "แค่สี", "SEO", "schema.org", "SMTP"], "answer": 0}, {"q": "Recognition pattern ใน UI", "choices": ["ใช้รูปแบบคุ้นเคย (เช่น ไอคอนตะกร้า=ช้อปปิ้ง)", "ใช้รูปใหม่หมด", "ใช้ตัวอักษรเล็ก", "ย้ายเมนู", "แอนิเมชันยาว"], "answer": 0}, {"q": "Endorphin เชื่อมกับ", "choices": ["ความสนุก/ผ่อนคลาย", "รางวัล/แรงจูงใจ", "ความมั่นคง", "ความผูกพัน", "ความเครียด"], "answer": 0}, {"q": "Serotonin เชื่อมกับ", "choices": ["ภูมิใจ/เสถียรภาพ", "ตื่นเต้น", "ตื่นตัว", "สมาธิสั้น", "ความกลัว"], "answer": 0}, {"q": "Oxytocin เชื่อมกับ", "choices": ["ความผูกพัน/ความไว้ใจ", "รางวัล", "ปวดหัว", "ความทรงจำ", "สมองช้า"], "answer": 0}, {"q": "ตัวอย่าง Investment ที่ใช้งานได้จริง", "choices": ["auto-play", "กรอกโปรไฟล์, สร้างลิสต์, follow เพื่อน", "โฆษณา cpm", "ป๊อปอัพข่าว", "Loading"], "answer": 1}, {"q": "ใน DS การตั้งชื่อ variant ที่ดีควร", "choices": ["mo1, mo2", "primary/secondary/ghost + sm/md/lg", "A/B/C", "1/2/3", "styleX"], "answer": 1}, {"q": "Template: Checkout มักประกอบด้วย", "choices": ["Header/Cart/Payment/Review", "Footer อย่างเดียว", "Search อย่างเดียว", "Slider", "Map"], "answer": 0}, {"q": "เมตริก “เรียนรู้เร็วไหม” ตรงสุด", "choices": ["SUS", "Time to first success", "จำนวนคลิก", "bounce", "DAU"], "answer": 1}, {"q": "ถ้าวัด “ลดข้อผิดพลาด” เลือก", "choices": ["Error rate ต่อ task", "สีหลัก", "ฟอนต์", "ระยะ gutter", "ขอบมน"], "answer": 0}];
+const match1 = [{"q": "ตรวจตั้งแต่ช่วงพัฒนา เพื่อหา pain point ไว", "a": "Formative"}, {"q": "ผู้เชี่ยวชาญเทียบกับหลักการมาตรฐาน UX", "a": "Heuristic Evaluation"}, {"q": "ผู้ใช้มือใหม่เดินตาม flow ว่ารู้ขั้นถัดไปไหม", "a": "Cognitive Walkthrough"}, {"q": "ขนาด+ระยะทางของเป้าหมายคลิก", "a": "Fitts’ Law"}, {"q": "ลดตัวเลือกเพื่อลดเวลาตัดสินใจ", "a": "Hick’s Law"}, {"q": "วัดเวลาเสร็จงาน/ข้อผิดพลาด/จำนวนคลิก", "a": "Performance Measurement"}, {"q": "ให้พูดคิดดังระหว่างทำงาน", "a": "Thinking-aloud"}, {"q": "เทสต์สองเวอร์ชัน สุ่มกลุ่ม วัด KPI เดียว", "a": "A/B Testing"}, {"q": "ใช้สิ่งที่คุ้นเคยแทนให้จำเอง", "a": "Recognition > Recall"}, {"q": "สรุปผลหลังเสร็จ/เทียบเกณฑ์", "a": "Summative"}];
+const match2 = [{"q": "หน่วยย่อยสุด เช่น icon, label", "a": "Atom"}, {"q": "กลุ่มย่อยรวมกัน เช่น input+button", "a": "Molecule"}, {"q": "ส่วนใหญ่ของหน้า เช่น header/nav", "a": "Organism"}, {"q": "โครงหน้ามาตรฐานยังไม่ใส่ข้อมูลจริง", "a": "Template"}, {"q": "หน้าจอพร้อมข้อมูลจริง", "a": "Page"}, {"q": "ช่องว่างขอบนอกของกริด", "a": "Margin"}, {"q": "ช่องว่างระหว่างเสา", "a": "Gutter"}, {"q": "เสาที่แบ่งพื้นที่คอนเทนต์", "a": "Columns"}, {"q": "primary/secondary/ghost, sm/md/lg", "a": "Variant"}, {"q": "hover/focus/disabled/error", "a": "State"}];
+const bank1 = ["Fitts’ Law", "Hick’s Law", "Recognition > Recall", "Cognitive Walkthrough", "Heuristic Evaluation", "Formative", "Summative", "Thinking-aloud", "A/B Testing", "Performance Measurement"];
+const bank2 = ["Atom", "Molecule", "Organism", "Template", "Page", "Margin", "Gutter", "Columns", "Variant", "State"];
+const tfData = [{"q": "Gamification = ทำให้ UI ดูเหมือนเกม", "a": false}, {"q": "Trigger ใน Hook Model เกิดหลังรับรางวัล", "a": false}, {"q": "Investment คือการลงแรง/ข้อมูลเพื่อผูกพันกับระบบ", "a": true}, {"q": "Design System ช่วย scale ทีมและทำงานเร็วขึ้น", "a": true}, {"q": "ใช้ไอคอน outline กับ solid ปนกันดีที่สุด", "a": false}, {"q": "Grid = Margin + Gutter + Columns", "a": true}, {"q": "Template กับ Page คือสิ่งเดียวกัน", "a": false}, {"q": "Formative ทำระหว่างพัฒนา ส่วน Summative ทำหลังเสร็จ", "a": true}, {"q": "Passive evaluation มักเก็บจากกลุ่มใหญ่ ต้นทุนต่ำ", "a": true}, {"q": "Active evaluation ไม่ได้ให้ผู้ใช้ทำ task จริง", "a": false}, {"q": "Heuristic evaluation ต้องมีผู้ใช้จริงเสมอ", "a": false}, {"q": "Cognitive walkthrough เน้นผู้ใช้มือใหม่", "a": true}, {"q": "Performance measurement ใช้วัด SUS อย่างเดียว", "a": false}, {"q": "A/B ที่ดีควรเปลี่ยนหลายอย่างพร้อมกัน", "a": false}, {"q": "Web UI testing ควรดู browser compatibility", "a": true}, {"q": "Mobile UI testing ควรดู battery/touch/offline", "a": true}, {"q": "Hick’s Law: ตัวเลือกมากขึ้น มักตัดสินใจเร็วขึ้น", "a": false}, {"q": "Fitts’ Law: ปุ่มใหญ่และอยู่ใกล้ → เข้าถึงเร็ว", "a": true}, {"q": "Recognition pattern: ใช้รูปแบบคุ้นเคยเพื่อลดภาระจำ", "a": true}, {"q": "Thinking-aloud ช่วยรู้เหตุผลเบื้องหลังการกระทำ", "a": true}];
+
+document.getElementById('copyLink').onclick = async () => {
+  try { await navigator.clipboard.writeText(location.href); alert('คัดลอกลิ้งแล้ว!'); }
+  catch(e){ prompt('คัดลอกไม่ได้ ใช้วิธี manual ก็ได้:', location.href);}
+};
+
+// ===== MCQ One-by-one =====
+let idx = 0;
+let picks = new Array(mcqData.length).fill(null);
+const qIdx = document.getElementById('qIdx');
+const qTotal = document.getElementById('qTotal');
+const qText = document.getElementById('qText');
+const opts = document.getElementById('opts');
+const exp = document.getElementById('exp');
+const progress = document.getElementById('progress');
+qTotal.textContent = mcqData.length;
+
+function render(){
+  const it = mcqData[idx];
+  qIdx.textContent = idx+1;
+  qText.textContent = it.q;
+  progress.style.width = ((idx)/mcqData.length*100)+'%';
+  exp.textContent='';
+  opts.innerHTML='';
+  it.choices.forEach((c,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'btn-opt px-4 py-2 rounded-xl bg-black/10 hover:bg-black/20 ring-1 ring-white/10';
+    btn.dataset.idx=i;
+    btn.textContent = ['a','b','c','d','e'][i] + ') ' + c;
+    if(picks[idx]===i) btn.dataset.picked='true';
+    btn.onclick = ()=>{
+      picks[idx]=i;
+      [...opts.children].forEach(ch=>ch.dataset.picked='false');
+      btn.dataset.picked='true';
+    };
+    opts.appendChild(btn);
+  });
+}
+render();
+
+document.getElementById('prev').onclick = ()=>{ idx = (idx-1+mcqData.length)%mcqData.length; render(); };
+document.getElementById('next').onclick = ()=>{ idx = (idx+1)%mcqData.length; render(); };
+document.getElementById('check').onclick = ()=>{
+  const pick = picks[idx];
+  if(pick===null){ exp.className='mt-3 text-sm text-amber-300'; exp.textContent='ยังไม่ได้เลือกคำตอบ'; return; }
+  const ok = pick===mcqData[idx].answer;
+  exp.className = 'mt-3 text-sm ' + (ok? 'text-emerald-300':'text-rose-300');
+  const letter = ['a','b','c','d','e'][mcqData[idx].answer];
+  exp.textContent = (ok?'✅ ถูกต้อง':'❌ ไม่ถูก') + ' • เฉลย: ' + letter + ') ' + mcqData[idx].choices[mcqData[idx].answer];
+};
+document.getElementById('mcqAll').onclick = ()=>{
+  let s=0; picks.forEach((p,i)=>{ if(p===mcqData[i].answer) s++; });
+  document.getElementById('mcqScore').textContent = 'คะแนน MCQ: ' + s + ' / ' + mcqData.length;
+};
+
+// ===== Matching =====
+
+function buildMatching(containerId, data, bank){
+  const container = document.getElementById(containerId);
+  const useNumbers = (containerId === 'match1' || containerId === 'match2');
+  data.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className='flex items-center gap-3';
+    const options = bank.map((b,j)=>{
+      const labelText = useNumbers ? (j+1) : String.fromCharCode(65+j);
+      return '<option value="'+b+'">'+labelText+'</option>';
+    }).join('');
+    row.innerHTML = ''
+      + '<div class="w-8 text-sm text-slate-300">'+(i+1)+'.</div>'
+      + '<div class="flex-1">'+item.q+'</div>'
+      + '<select id="'+containerId+'-'+i+'" class="px-3 py-2 rounded-xl bg-slate-900/60 ring-1 ring-white/10">'
+        + '<option value="">เลือก</option>' + options +
+      '</select>'
+      + '<div id="'+containerId+'-exp-'+i+'" class="text-sm ml-2"></div>';
+    container.appendChild(row);
+  });
+}
+buildMatching('match1', match1, bank1);
+buildMatching('match2', match2, bank2);
+
+document.getElementById('matchSubmit').onclick = () => {
+  let score=0,total=match1.length+match2.length;
+  
+  function check(containerId, data, bank){
+    const useNumbers = (containerId === 'match1' || containerId === 'match2');
+    data.forEach((item,i)=>{
+      const sel=document.getElementById(containerId+'-'+i);
+      const exp=document.getElementById(containerId+'-exp-'+i);
+      if(!sel.value){ exp.textContent=''; return; }
+      const ok = sel.value===item.a;
+      if(ok) score++;
+      exp.className='text-sm ' + (ok?'text-emerald-300':'text-rose-300');
+      const idxAns = bank.indexOf(item.a);
+      const label = useNumbers ? (idxAns+1) : String.fromCharCode(65+idxAns);
+      exp.textContent = (ok?'✅':'❌') + ' เฉลย: ' + label + ' = ' + item.a;
+    });
+  }
+  check('match1', match1, bank1);
+  check('match2', match2, bank2);
+  document.getElementById('matchScore').textContent = 'คะแนนจับคู่: ' + score + ' / ' + total;
+};
+
+// ===== True/False =====
+const tfList = document.getElementById('tfList');
+let tfPicks = new Array(tfData.length).fill(null);
+tfData.forEach((item,idx)=>{
+  const row=document.createElement('div');
+  row.className='tf-row rounded-2xl bg-white/5 ring-1 ring-white/10 p-3';
+  row.innerHTML=''
+    + '<div class="flex items-start gap-3">'
+    +   '<div class="w-7 h-7 grid place-items-center rounded-xl bg-slate-800/70 ring-1 ring-white/10 text-sm">'+(idx+1)+'</div>'
+    +   '<div class="flex-1">'+item.q+'</div>'
+    +   '<div class="shrink-0 flex gap-2">'
+    +     '<button id="t'+idx+'-true" class="px-3 py-2 rounded-xl bg-black/10 hover:bg-black/20 ring-1 ring-white/10">ถูก</button>'
+    +     '<button id="t'+idx+'-false" class="px-3 py-2 rounded-xl bg-black/10 hover:bg-black/20 ring-1 ring-white/10">ผิด</button>'
+    +   '</div>'
+    + '</div>'
+    + '<div id="texp-'+idx+'" class="mt-1 text-sm"></div>';
+  tfList.appendChild(row);
+  document.getElementById('t'+idx+'-true').onclick = ()=>{ tfPicks[idx]=true; };
+  document.getElementById('t'+idx+'-false').onclick = ()=>{ tfPicks[idx]=false; };
+});
+
+document.getElementById('tfSubmit').onclick = ()=>{
+  let score=0;
+  tfData.forEach((item,idx)=>{
+    const exp=document.getElementById('texp-'+idx);
+    const pick=tfPicks[idx];
+    if(pick===null){ exp.textContent=''; return; }
+    const ok = pick === item.a;
+    if(ok) score++;
+    exp.className='mt-1 text-sm ' + (ok?'text-emerald-300':'text-rose-300');
+    exp.textContent=(ok?'✅ ถูกต้อง':'❌ ไม่ถูก') + ' • เฉลย: ' + (item.a? 'ถูก':'ผิด');
+  });
+  document.getElementById('tfScore').textContent = 'คะแนนถูก/ผิด: ' + score + ' / ' + tfData.length;
+};
+</script>
+</body>
+</html>
